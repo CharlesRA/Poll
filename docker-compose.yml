@@ -1,12 +1,18 @@
 version: '3'
 services:
   db:
-    image: postgres:12.0
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD : password
+      POSTGRES_USER : postgres
+      HOST_HOSTNAME : db
   redis:
     image: redis:5.0
     restart: always
     ports:
        - "6379"
+    environment:
+      HOST_HOSTNAME : redis
   worker:
     depends_on:
       - redis
@@ -15,6 +21,8 @@ services:
       - redis
       - db
     build: ./worker
+    environment:
+      HOST_HOSTNAME : worker
   poll:
     depends_on:
       - redis
@@ -23,6 +31,8 @@ services:
       - "5000:80"
     links:
       - redis
+    environment:
+      HOST_HOSTNAME : poll
   result:
       depends_on:
         - db
@@ -31,5 +41,7 @@ services:
       build: ./result
       ports:
          - "5001:4242"
+      environment:
+        HOST_HOSTNAME : result
 volumes:
   db-data: {}
