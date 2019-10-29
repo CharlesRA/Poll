@@ -6,6 +6,11 @@ services:
       POSTGRES_PASSWORD : password
       POSTGRES_USER : postgres
       HOST_HOSTNAME : db
+    volumes:
+        - ./shema.sql:/docker-entrypoint-initdb.d/shema.sql
+    networks:
+        - result-tier
+        - back-tier
   redis:
     image: redis:5.0
     restart: always
@@ -13,6 +18,9 @@ services:
        - "6379"
     environment:
       HOST_HOSTNAME : redis
+    networks:
+        - back-tier
+        - poll-tier
   worker:
     depends_on:
       - redis
@@ -23,6 +31,8 @@ services:
     build: ./worker
     environment:
       HOST_HOSTNAME : worker
+    networks:
+        - back-tier
   poll:
     depends_on:
       - redis
@@ -33,6 +43,8 @@ services:
       - redis
     environment:
       HOST_HOSTNAME : poll
+    networks:
+        - poll-tier
   result:
       depends_on:
         - db
@@ -40,8 +52,14 @@ services:
         - db
       build: ./result
       ports:
-         - "5001:4242"
+         - "5001:80"
       environment:
         HOST_HOSTNAME : result
+      networks:
+        - result-tier
+networks:
+    poll-tier:
+    result-tier:
+    back-tier:
 volumes:
   db-data: {}
