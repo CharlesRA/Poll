@@ -7,6 +7,7 @@ services:
       POSTGRES_USER : postgres
       HOST_HOSTNAME : db
     volumes:
+        - db-data:/var/lib/postgres
         - ./shema.sql:/docker-entrypoint-initdb.d/shema.sql
     networks:
         - result-tier
