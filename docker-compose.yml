@@ -11,6 +11,7 @@ services:
     networks:
         - result-tier
         - back-tier
+    restart: always
   redis:
     image: redis:5.0
     restart: always
@@ -33,6 +34,7 @@ services:
       HOST_HOSTNAME : worker
     networks:
         - back-tier
+    restart: always
   poll:
     depends_on:
       - redis
@@ -41,6 +43,7 @@ services:
       - "5000:80"
     links:
       - redis
+    restart: always
     environment:
       HOST_HOSTNAME : poll
     networks:
@@ -57,6 +60,7 @@ services:
         HOST_HOSTNAME : result
       networks:
         - result-tier
+      restart: always
 networks:
     poll-tier:
     result-tier:
